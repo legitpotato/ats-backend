@@ -7,7 +7,7 @@ const cron = require("node-cron");
 const watchdogTransferencias = require("./utils/watchdogTransferencias");
 const { caducarSolicitudesAntiguas } = require("./utils/solExpiradas");
 
-// Cron jobs
+// CRON JOBS
 caducarSolicitudesAntiguas();
 setInterval(caducarSolicitudesAntiguas, 24 * 60 * 60 * 1000);
 
@@ -19,12 +19,21 @@ setInterval(uniExpiradas, 24 * 60 * 60 * 1000);
 
 const app = express();
 
-// ✅ Aquí agregamos el CORS configurado correctamente:
+// CORS — actualizado para tus dominios reales
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://ats-tawny.vercel.app",
+  "https://ats-legitpotatos-projects.vercel.app",
+  "https://ats-git-main-legitpotatos-projects.vercel.app",
+  "https://ats-ixthsy77o-legitpotatos-projects.vercel.app",
+];
+
 app.use(cors({
-  origin: [
-    "http://localhost:5173",              // para desarrollo local
-    "https://ats-backend-yvfd.onrender.com",    // para producción
-  ],
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // Permite Postman / curl / SSR
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error(`CORS bloqueado para origen: ${origin}`));
+  },
   credentials: true,
 }));
 
